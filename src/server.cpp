@@ -16,7 +16,7 @@ Server::Server(int port) {
         return;
     }
 
-    memset(&server_addr, 0, sizeof(server_addr)); // clear
+    server_addr = sockaddr_in{};
 
     server_addr.sin_family = AF_INET; // IPv4
     server_addr.sin_port = htons(port);   // port chosen (default 0)
@@ -34,7 +34,10 @@ Server::Server(int port) {
 
 // Delete server functionality
 Server::~Server() {
-    close(listen_fd);
+    if (listen_fd >= 0) {
+        close(listen_fd);
+    }
+    // will clear the client_fds and mutex automatically (won't use new)
 }
 
 void Server::broadcast(const std::string& msg) {
